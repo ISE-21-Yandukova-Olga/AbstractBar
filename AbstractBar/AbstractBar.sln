@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractBarModel", "AbstractBarModel\AbstractBarModel.csproj", "{1446B8EA-2273-40FD-873D-92909A3196A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractBarService", "AbstractBarService\AbstractBarService.csproj", "{05566C10-E5B1-47E8-896F-3205CCE17C2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractBarView", "AbstractBarView\AbstractBarView.csproj", "{79632816-A73F-4B32-89FB-F63496871163}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1446B8EA-2273-40FD-873D-92909A3196A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1446B8EA-2273-40FD-873D-92909A3196A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1446B8EA-2273-40FD-873D-92909A3196A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1446B8EA-2273-40FD-873D-92909A3196A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05566C10-E5B1-47E8-896F-3205CCE17C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05566C10-E5B1-47E8-896F-3205CCE17C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05566C10-E5B1-47E8-896F-3205CCE17C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05566C10-E5B1-47E8-896F-3205CCE17C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79632816-A73F-4B32-89FB-F63496871163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79632816-A73F-4B32-89FB-F63496871163}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79632816-A73F-4B32-89FB-F63496871163}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79632816-A73F-4B32-89FB-F63496871163}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
