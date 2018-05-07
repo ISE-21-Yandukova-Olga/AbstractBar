@@ -19,48 +19,38 @@ namespace AbstractBarService.ImplementationsList
 
         public List<BarmenViewModel> GetList()
         {
-            List<BarmenViewModel> result = new List<BarmenViewModel>();
-            for (int i = 0; i < source.Barmens.Count; ++i)
-            {
-                result.Add(new BarmenViewModel
+            List<BarmenViewModel> result = source.Barmens
+                .Select(rec => new BarmenViewModel
                 {
-                    Id = source.Barmens[i].Id,
-                    BarmenFIO = source.Barmens[i].BarmenFIO
-                });
-            }
+                    Id = rec.Id,
+                    BarmenFIO = rec.BarmenFIO
+                })
+                .ToList();
             return result;
         }
 
         public BarmenViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Barmens.Count; ++i)
+            Barmen element = source.Barmens.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Barmens[i].Id == id)
+                return new BarmenViewModel
                 {
-                    return new BarmenViewModel
-                    {
-                        Id = source.Barmens[i].Id,
-                        BarmenFIO = source.Barmens[i].BarmenFIO
-                    };
-                }
+                    Id = element.Id,
+                    BarmenFIO = element.BarmenFIO
+                };
             }
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(BarmenBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Barmens.Count; ++i)
+            Barmen element = source.Barmens.FirstOrDefault(rec => rec.BarmenFIO == model.BarmenFIO);
+            if (element != null)
             {
-                if (source.Barmens[i].Id > maxId)
-                {
-                    maxId = source.Barmens[i].Id;
-                }
-                if (source.Barmens[i].BarmenFIO == model.BarmenFIO)
-                {
-                    throw new Exception("Уже есть сотрудник с таким ФИО");
-                }
+                throw new Exception("Уже есть сотрудник с таким ФИО");
             }
+            int maxId = source.Barmens.Count > 0 ? source.Barmens.Max(rec => rec.Id) : 0;
             source.Barmens.Add(new Barmen
             {
                 Id = maxId + 1,
@@ -70,37 +60,31 @@ namespace AbstractBarService.ImplementationsList
 
         public void UpdElement(BarmenBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Barmens.Count; ++i)
+            Barmen element = source.Barmens.FirstOrDefault(rec =>
+                                        rec.BarmenFIO == model.BarmenFIO && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Barmens[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Barmens[i].BarmenFIO == model.BarmenFIO &&
-                    source.Barmens[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть сотрудник с таким ФИО");
-                }
+                throw new Exception("Уже есть сотрудник с таким ФИО");
             }
-            if (index == -1)
+            element = source.Barmens.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Barmens[index].BarmenFIO = model.BarmenFIO;
+            element.BarmenFIO = model.BarmenFIO;
         }
 
         public void DelElement(int id)
         {
-            for (int i = 0; i < source.Barmens.Count; ++i)
+            Barmen element = source.Barmens.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Barmens[i].Id == id)
-                {
-                    source.Barmens.RemoveAt(i);
-                    return;
-                }
+                source.Barmens.Remove(element);
             }
-            throw new Exception("Элемент не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }

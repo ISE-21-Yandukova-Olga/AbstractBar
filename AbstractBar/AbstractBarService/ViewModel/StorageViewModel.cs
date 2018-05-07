@@ -12,6 +12,6 @@ namespace AbstractBarService.ViewModel
 
         public string StorageName { get; set; }
 
-        public List<StorageIngredientsViewModel> StorageIngredients { get; set; }
+        public List<StorageIngredientsViewModel> StorageIngredients{ get; set;}
     }
 }
