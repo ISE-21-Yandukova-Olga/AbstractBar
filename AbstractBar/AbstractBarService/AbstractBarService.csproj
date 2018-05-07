@@ -30,7 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -40,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractDbContext.cs" />
     <Compile Include="BindingModel\BarmenBindingModel.cs" />
     <Compile Include="BindingModel\CoctailBindingModel.cs" />
     <Compile Include="BindingModel\CoctailIngredientsBindingModel.cs" />
@@ -48,7 +58,18 @@
     <Compile Include="BindingModel\RequestBindingModel.cs" />
     <Compile Include="BindingModel\StorageBindingModel.cs" />
     <Compile Include="BindingModel\StorageIngredientsBindingModel.cs" />
-    <Compile Include="ViewModel\DataList.cs" />
+    <Compile Include="DataList.cs" />
+    <Compile Include="ImplementationsBD\BarmenServiceBD.cs" />
+    <Compile Include="ImplementationsBD\CoctailServiceBD.cs" />
+    <Compile Include="ImplementationsBD\CustomerServiceBD.cs" />
+    <Compile Include="ImplementationsBD\IngredientsServiceBD.cs" />
+    <Compile Include="ImplementationsBD\MainServiceBD.cs" />
+    <Compile Include="ImplementationsBD\StorageServiceBD.cs" />
+    <Compile Include="Migrations\201805050909150_FirstMigration.cs" />
+    <Compile Include="Migrations\201805050909150_FirstMigration.Designer.cs">
+      <DependentUpon>201805050909150_FirstMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ImplementationsList\BarmenServiceList.cs" />
     <Compile Include="ImplementationsList\CoctailServiceList.cs" />
     <Compile Include="ImplementationsList\CustomerServiceList.cs" />
@@ -76,6 +97,17 @@
       <Project>{1446B8EA-2273-40FD-873D-92909A3196A2}</Project>
       <Name>AbstractBarModel</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201805050909150_FirstMigration.resx">
+      <DependentUpon>201805050909150_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

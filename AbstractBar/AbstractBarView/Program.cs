@@ -1,8 +1,11 @@
 ﻿using AbstracBarView;
+using AbstractBarService;
+using AbstractBarService.ImplementationsBD;
 using AbstractBarService.ImplementationsList;
 using AbstractBarService.Interface;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -28,12 +31,13 @@ namespace AbstractBarView
         public static IUnityContainer BuildUnityContainer()
         {
             var currentContainer = new UnityContainer();
-            currentContainer.RegisterType<ICustomerService, CustomerServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IIngredientsService, IngredientsServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IBarmenService, BarmenServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<ICoctailService, CoctailServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IStorageService, StorageServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IMainService, MainServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<DbContext, AbstractDbContext>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<ICustomerService, CustomerServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IIngredientsService, IngredientsServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IBarmenService, BarmenServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<ICoctailService, CoctailServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IStorageService, StorageServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IMainService, MainServiceBD>(new HierarchicalLifetimeManager());
 
             return currentContainer;
         }

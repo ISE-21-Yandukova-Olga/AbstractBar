@@ -15,5 +15,8 @@ namespace AbstractBarModel
         public int Ingredients_Id { get; set; }
 
         public int Count { get; set; }
+        public virtual Storage Storage { get; set; }
+
+        public virtual Ingredients Ingredients { get; set; }
     }
 }
