@@ -32,7 +32,7 @@ namespace AbstracBarView
             this.service = service;
         }
 
-        private void FormArchive_Load(object sender, EventArgs e)
+        private void FormStorage_Load(object sender, EventArgs e)
         {
             if (id.HasValue)
             {

@@ -48,7 +48,7 @@
     <Compile Include="BindingModel\RequestBindingModel.cs" />
     <Compile Include="BindingModel\StorageBindingModel.cs" />
     <Compile Include="BindingModel\StorageIngredientsBindingModel.cs" />
-    <Compile Include="DataList.cs" />
+    <Compile Include="ViewModel\DataList.cs" />
     <Compile Include="ImplementationsList\BarmenServiceList.cs" />
     <Compile Include="ImplementationsList\CoctailServiceList.cs" />
     <Compile Include="ImplementationsList\CustomerServiceList.cs" />

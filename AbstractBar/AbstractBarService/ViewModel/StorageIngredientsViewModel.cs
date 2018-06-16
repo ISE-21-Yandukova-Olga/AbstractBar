@@ -12,7 +12,7 @@ namespace AbstractBarService.ViewModel
 
         public int StorageId { get; set; }
 
-        public int Coctail_Id { get; set; }
+        public int Ingredients_Id { get; set; }
 
         public string IngredientsName { get; set; }
 

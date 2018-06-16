@@ -37,7 +37,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Location = new System.Drawing.Point(293, 39);
-            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonCancel.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(100, 28);
             this.buttonCancel.TabIndex = 3;
@@ -48,7 +48,7 @@
             // buttonSave
             // 
             this.buttonSave.Location = new System.Drawing.Point(185, 39);
-            this.buttonSave.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonSave.Margin = new System.Windows.Forms.Padding(4);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(100, 28);
             this.buttonSave.TabIndex = 2;
@@ -59,7 +59,7 @@
             // textBoxName
             // 
             this.textBoxName.Location = new System.Drawing.Point(104, 7);
-            this.textBoxName.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxName.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(288, 22);
             this.textBoxName.TabIndex = 1;
@@ -74,7 +74,7 @@
             this.labelName.TabIndex = 0;
             this.labelName.Text = "Название:";
             // 
-            // FormForm
+            // FormCoctail
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -83,10 +83,10 @@
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.textBoxName);
             this.Controls.Add(this.labelName);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.Name = "FormForm";
+            this.Margin = new System.Windows.Forms.Padding(4);
+            this.Name = "FormCoctail";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Коктейли";
+            this.Text = "Ингредиенты";
             this.Load += new System.EventHandler(this.FormComponent_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

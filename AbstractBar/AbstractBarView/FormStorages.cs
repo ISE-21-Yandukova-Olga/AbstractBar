@@ -21,7 +21,7 @@ namespace AbstracBarView
             this.service = service;
         }
 
-        private void FormFormStorages_Load(object sender, EventArgs e)
+        private void FormStorages_Load(object sender, EventArgs e)
         {
             LoadData();
         }

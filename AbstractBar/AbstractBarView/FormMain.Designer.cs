@@ -74,7 +74,7 @@
             // клиентыToolStripMenuItem
             // 
             this.клиентыToolStripMenuItem.Name = "клиентыToolStripMenuItem";
-            this.клиентыToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
+            this.клиентыToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.клиентыToolStripMenuItem.Text = "Клиенты";
             this.клиентыToolStripMenuItem.Click += new System.EventHandler(this.клиентыToolStripMenuItem_Click);
             // 
@@ -96,7 +96,7 @@
             // 
             this.архивToolStripMenuItem.Name = "архивToolStripMenuItem";
             this.архивToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
-            this.архивToolStripMenuItem.Text = "Склад";
+            this.архивToolStripMenuItem.Text = "Хранилище";
             this.архивToolStripMenuItem.Click += new System.EventHandler(this.архивToolStripMenuItem_Click);
             // 
             // юристыToolStripMenuItem
@@ -109,14 +109,14 @@
             // пополнитьАрхивToolStripMenuItem
             // 
             this.пополнитьАрхивToolStripMenuItem.Name = "пополнитьАрхивToolStripMenuItem";
-            this.пополнитьАрхивToolStripMenuItem.Size = new System.Drawing.Size(141, 24);
-            this.пополнитьАрхивToolStripMenuItem.Text = "Пополнить склад";
+            this.пополнитьАрхивToolStripMenuItem.Size = new System.Drawing.Size(182, 24);
+            this.пополнитьАрхивToolStripMenuItem.Text = "Пополнить хранилище";
             this.пополнитьАрхивToolStripMenuItem.Click += new System.EventHandler(this.пополнитьАрхивToolStripMenuItem_Click);
             // 
             // buttonPayRequest
             // 
             this.buttonPayRequest.Location = new System.Drawing.Point(1184, 246);
-            this.buttonPayRequest.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonPayRequest.Margin = new System.Windows.Forms.Padding(4);
             this.buttonPayRequest.Name = "buttonPayRequest";
             this.buttonPayRequest.Size = new System.Drawing.Size(199, 28);
             this.buttonPayRequest.TabIndex = 4;
@@ -127,7 +127,7 @@
             // buttonRequestReady
             // 
             this.buttonRequestReady.Location = new System.Drawing.Point(1184, 182);
-            this.buttonRequestReady.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonRequestReady.Margin = new System.Windows.Forms.Padding(4);
             this.buttonRequestReady.Name = "buttonRequestReady";
             this.buttonRequestReady.Size = new System.Drawing.Size(199, 28);
             this.buttonRequestReady.TabIndex = 3;
@@ -138,7 +138,7 @@
             // buttonTakeRequestInWork
             // 
             this.buttonTakeRequestInWork.Location = new System.Drawing.Point(1184, 124);
-            this.buttonTakeRequestInWork.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonTakeRequestInWork.Margin = new System.Windows.Forms.Padding(4);
             this.buttonTakeRequestInWork.Name = "buttonTakeRequestInWork";
             this.buttonTakeRequestInWork.Size = new System.Drawing.Size(199, 28);
             this.buttonTakeRequestInWork.TabIndex = 2;
@@ -149,7 +149,7 @@
             // buttonCreateRequest
             // 
             this.buttonCreateRequest.Location = new System.Drawing.Point(1184, 62);
-            this.buttonCreateRequest.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonCreateRequest.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCreateRequest.Name = "buttonCreateRequest";
             this.buttonCreateRequest.Size = new System.Drawing.Size(199, 28);
             this.buttonCreateRequest.TabIndex = 1;
@@ -165,7 +165,7 @@
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView.Dock = System.Windows.Forms.DockStyle.Left;
             this.dataGridView.Location = new System.Drawing.Point(0, 28);
-            this.dataGridView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dataGridView.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.ReadOnly = true;
             this.dataGridView.Size = new System.Drawing.Size(1164, 342);
@@ -174,7 +174,7 @@
             // buttonRef
             // 
             this.buttonRef.Location = new System.Drawing.Point(1184, 309);
-            this.buttonRef.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonRef.Margin = new System.Windows.Forms.Padding(4);
             this.buttonRef.Name = "buttonRef";
             this.buttonRef.Size = new System.Drawing.Size(199, 28);
             this.buttonRef.TabIndex = 5;
@@ -195,7 +195,7 @@
             this.Controls.Add(this.dataGridView);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormMain";
             this.Text = "Бар";
             this.menuStrip1.ResumeLayout(false);
