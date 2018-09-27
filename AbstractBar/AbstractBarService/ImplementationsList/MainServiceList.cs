@@ -21,68 +21,32 @@ namespace AbstractBarService.ImplementationsList
 
         public List<RequestViewModel> GetList()
         {
-            List<RequestViewModel> result = new List<RequestViewModel>();
-            for (int i = 0; i < source.Requests.Count; ++i)
-            {
-                string CustomerFIO = string.Empty;
-                for (int j = 0; j < source.Customers.Count; ++j)
+            List<RequestViewModel> result = source.Requests
+                .Select(rec => new RequestViewModel
                 {
-                    if (source.Customers[j].Id == source.Requests[i].CustomerId)
-                    {
-                        CustomerFIO = source.Customers[j].CustomerFIO;
-                        break;
-                    }
-                }
-                string CoctailName = string.Empty;
-                for (int j = 0; j < source.Coctails.Count; ++j)
-                {
-                    if (source.Coctails[j].Id == source.Requests[i].CoctailId)
-                    {
-                        CoctailName = source.Coctails[j].CoctailName;
-                        break;
-                    }
-                }
-                string BarmenFIO = string.Empty;
-                if (source.Requests[i].BarmenId.HasValue)
-                {
-                    for (int j = 0; j < source.Barmens.Count; ++j)
-                    {
-                        if (source.Barmens[j].Id == source.Requests[i].BarmenId.Value)
-                        {
-                            BarmenFIO = source.Barmens[j].BarmenFIO;
-                            break;
-                        }
-                    }
-                }
-                result.Add(new RequestViewModel
-                {
-                    Id = source.Requests[i].Id,
-                    CustomerId = source.Requests[i].CustomerId,
-                    CustomerFIO = CustomerFIO,
-                    CoctailId = source.Requests[i].CoctailId,
-                    CoctailName = CoctailName,
-                    BarmenId = source.Requests[i].BarmenId,
-                    BarmenName = BarmenFIO,
-                    Count = source.Requests[i].Count,
-                    Sum = source.Requests[i].Sum,
-                    DateCreate = source.Requests[i].DateCreate.ToLongDateString(),
-                    DateImplement = source.Requests[i].DateImplement?.ToLongDateString(),
-                    Status = source.Requests[i].Status.ToString()
-                });
-            }
+                    Id = rec.Id,
+                    CustomerId = rec.CustomerId,
+                    CoctailId = rec.CoctailId,
+                   BarmenId = rec.BarmenId,
+                    DateCreate = rec.DateCreate.ToLongDateString(),
+                    DateImplement = rec.DateImplement?.ToLongDateString(),
+                    Status = rec.Status.ToString(),
+                    Count = rec.Count,
+                    Sum = rec.Sum,
+                    CustomerFIO = source.Customers
+                                    .FirstOrDefault(recC => recC.Id == rec.CustomerId)?.CustomerFIO,
+                    CoctailName = source.Coctails
+                                    .FirstOrDefault(recP => recP.Id == rec.CoctailId)?.CoctailName,
+                   BarmenName = source.Barmens
+                                    .FirstOrDefault(recI => recI.Id == rec.BarmenId)?.BarmenFIO
+                })
+                .ToList();
             return result;
         }
 
         public void CreateRequest(RequestBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Requests.Count; ++i)
-            {
-                if (source.Requests[i].Id > maxId)
-                {
-                    maxId = source.Customers[i].Id;
-                }
-            }
+            int maxId = source.Requests.Count > 0 ? source.Requests.Max(rec => rec.Id) : 0;
             source.Requests.Add(new Request
             {
                 Id = maxId + 1,
@@ -97,134 +61,92 @@ namespace AbstractBarService.ImplementationsList
 
         public void TakeRequestInWork(RequestBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Requests.Count; ++i)
-            {
-                if (source.Requests[i].Id == model.Id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Request element = source.Requests.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
             // смотрим по количеству компонентов на складах
-            for (int i = 0; i < source.CoctailIngredients.Count; ++i)
+            var CoctailIngredients = source.CoctailIngredients.Where(rec => rec.CoctailId == element.CoctailId);
+            foreach (var CoctailIngredient in CoctailIngredients)
             {
-                if (source.CoctailIngredients[i].CoctailId == source.Requests[index].CoctailId)
+                int countOnStorages = source.StorageIngredients
+                                            .Where(rec => rec.IngredientId == CoctailIngredient.IngredientId)
+                                            .Sum(rec => rec.Count);
+                if (countOnStorages < CoctailIngredient.Count * element.Count)
                 {
-                    int countOnStorages = 0;
-                    for (int j = 0; j < source.StorageIngredients.Count; ++j)
-                    {
-                        if (source.StorageIngredients[j].IngredientId == source.CoctailIngredients[i].IngredientId)
-                        {
-                            countOnStorages += source.StorageIngredients[j].Count;
-                        }
-                    }
-                    if (countOnStorages < source.CoctailIngredients[i].Count * source.Requests[index].Count)
-                    {
-                        for (int j = 0; j < source.Ingredients.Count; ++j)
-                        {
-                            if (source.Ingredients[j].Id == source.CoctailIngredients[i].IngredientId)
-                            {
-                                throw new Exception("Не достаточно компонента " + source.Ingredients[j].IngredientName +
-                                    " требуется " + source.CoctailIngredients[i].Count + ", в наличии " + countOnStorages);
-                            }
-                        }
-                    }
+                    var IngredientName = source.Ingredients
+                                    .FirstOrDefault(rec => rec.Id == CoctailIngredient.IngredientId);
+                    throw new Exception("Не достаточно компонента " + IngredientName?.IngredientName +
+                        " требуется " + CoctailIngredient.Count + ", в наличии " + countOnStorages);
                 }
             }
             // списываем
-            for (int i = 0; i < source.CoctailIngredients.Count; ++i)
+            foreach (var CoctailIngredient in CoctailIngredients)
             {
-                if (source.CoctailIngredients[i].CoctailId == source.Requests[index].CoctailId)
+                int countOnStorages = CoctailIngredient.Count * element.Count;
+                var StorageIngredients = source.StorageIngredients
+                                            .Where(rec => rec.IngredientId == CoctailIngredient.IngredientId);
+                foreach (var StorageIngredient in StorageIngredients)
                 {
-                    int countOnStorages = source.CoctailIngredients[i].Count * source.Requests[index].Count;
-                    for (int j = 0; j < source.StorageIngredients.Count; ++j)
+                    // компонентов на одном слкаде может не хватать
+                    if (StorageIngredient.Count >= countOnStorages)
                     {
-                        if (source.StorageIngredients[j].IngredientId == source.CoctailIngredients[i].IngredientId)
-                        {
-                            // компонентов на одном слкаде может не хватать
-                            if (source.StorageIngredients[j].Count >= countOnStorages)
-                            {
-                                source.StorageIngredients[j].Count -= countOnStorages;
-                                break;
-                            }
-                            else
-                            {
-                                countOnStorages -= source.StorageIngredients[j].Count;
-                                source.StorageIngredients[j].Count = 0;
-                            }
-                        }
+                        StorageIngredient.Count -= countOnStorages;
+                        break;
+                    }
+                    else
+                    {
+                        countOnStorages -= StorageIngredient.Count;
+                        StorageIngredient.Count = 0;
                     }
                 }
             }
-            source.Requests[index].BarmenId = model.BarmenId;
-            source.Requests[index].DateImplement = DateTime.Now;
-            source.Requests[index].Status = RequestStatus.Выполняется;
+            element.BarmenId = model.BarmenId;
+            element.DateImplement = DateTime.Now;
+            element.Status = RequestStatus.Выполняется;
         }
 
         public void FinishRequest(int id)
         {
-            int index = -1;
-            for (int i = 0; i < source.Requests.Count; ++i)
-            {
-                if (source.Customers[i].Id == id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Request element = source.Requests.FirstOrDefault(rec => rec.Id == id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Requests[index].Status = RequestStatus.Готов;
+            element.Status = RequestStatus.Готов;
         }
 
         public void PayRequest(int id)
         {
-            int index = -1;
-            for (int i = 0; i < source.Requests.Count; ++i)
-            {
-                if (source.Customers[i].Id == id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Request element = source.Requests.FirstOrDefault(rec => rec.Id == id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Requests[index].Status = RequestStatus.Оплачен;
+            element.Status = RequestStatus.Оплачен;
         }
 
         public void PutIngredientOnStorage(StorageIngredientBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.StorageIngredients.Count; ++i)
+            StorageIngredient element = source.StorageIngredients
+                                                .FirstOrDefault(rec => rec.StorageId == model.StorageId &&
+                                                                    rec.IngredientId == model.IngredientId);
+            if (element != null)
             {
-                if (source.StorageIngredients[i].StorageId == model.StorageId &&
-                    source.StorageIngredients[i].IngredientId == model.IngredientId)
-                {
-                    source.StorageIngredients[i].Count += model.Count;
-                    return;
-                }
-                if (source.StorageIngredients[i].Id > maxId)
-                {
-                    maxId = source.StorageIngredients[i].Id;
-                }
+                element.Count += model.Count;
             }
-            source.StorageIngredients.Add(new StorageIngredient
+            else
             {
-                Id = ++maxId,
-                StorageId = model.StorageId,
-                IngredientId = model.IngredientId,
-                Count = model.Count
-            });
+                int maxId = source.StorageIngredients.Count > 0 ? source.StorageIngredients.Max(rec => rec.Id) : 0;
+                source.StorageIngredients.Add(new StorageIngredient
+                {
+                    Id = ++maxId,
+                    StorageId = model.StorageId,
+                    IngredientId = model.IngredientId,
+                    Count = model.Count
+                });
+            }
         }
     }
 }
