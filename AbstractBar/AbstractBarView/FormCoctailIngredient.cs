@@ -28,21 +28,17 @@ namespace AbstractBarView
         {
             try
             {
-                var response = APIClient.GetRequest("api/Ingredient/GetList");
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    comboBoxComponent.DisplayMember = "IngredientName";
-                    comboBoxComponent.ValueMember = "Id";
-                    comboBoxComponent.DataSource = APIClient.GetElement<List<IngredientViewModel>>(response);
-                    comboBoxComponent.SelectedItem = null;
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                comboBoxComponent.DisplayMember = "IngredientName";
+                comboBoxComponent.ValueMember = "Id";
+                comboBoxComponent.DataSource = Task.Run(() => APIClient.GetRequestData<List<IngredientViewModel>>("api/Ingredient/GetList")).Result;
+                comboBoxComponent.SelectedItem = null;
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             if (model != null)
@@ -96,4 +92,5 @@ namespace AbstractBarView
             Close();
         }
     }
+
 }
