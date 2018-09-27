@@ -3,35 +3,23 @@ using AbstractBarService.Interfaces;
 using AbstractBarService.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+using System.Net.Http;
 
 namespace AbstractBarView
 {
     public partial class FormCoctail : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public int Id { set { id = value; } }
-
-        private readonly ICoctailService service;
 
         private int? id;
 
-        private List<CoctailIngredientViewModel> packageForms;
+        private List<CoctailIngredientViewModel> CoctailIngredients;
 
-        public FormCoctail(ICoctailService service)
+        public FormCoctail()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormCoctail_Load(object sender, EventArgs e)
@@ -40,13 +28,18 @@ namespace AbstractBarView
             {
                 try
                 {
-                    CoctailViewModel view = service.GetElement(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Coctail/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxName.Text = view.CoctailName;
-                        textBoxPrice.Text = view.Price.ToString();
-                        packageForms = view.CoctailIngredients;
+                        var Coctail = APIClient.GetElement<CoctailViewModel>(response);
+                        textBoxName.Text = Coctail.CoctailName;
+                        textBoxPrice.Text = Coctail.Price.ToString();
+                        CoctailIngredients = Coctail.CoctailIngredients;
                         LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -56,7 +49,7 @@ namespace AbstractBarView
             }
             else
             {
-                packageForms = new List<CoctailIngredientViewModel>();
+                CoctailIngredients = new List<CoctailIngredientViewModel>();
             }
         }
 
@@ -64,10 +57,10 @@ namespace AbstractBarView
         {
             try
             {
-                if (packageForms != null)
+                if (CoctailIngredients != null)
                 {
                     dataGridView.DataSource = null;
-                    dataGridView.DataSource = packageForms;
+                    dataGridView.DataSource = CoctailIngredients;
                     dataGridView.Columns[0].Visible = false;
                     dataGridView.Columns[1].Visible = false;
                     dataGridView.Columns[2].Visible = false;
@@ -82,7 +75,7 @@ namespace AbstractBarView
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormCoctailIngredient>();
+            var form = new FormCoctailIngredient();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 if (form.Model != null)
@@ -91,7 +84,7 @@ namespace AbstractBarView
                     {
                         form.Model.CoctailId = id.Value;
                     }
-                    packageForms.Add(form.Model);
+                    CoctailIngredients.Add(form.Model);
                 }
                 LoadData();
             }
@@ -101,11 +94,11 @@ namespace AbstractBarView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormCoctailIngredient>();
-                form.Model = packageForms[dataGridView.SelectedRows[0].Cells[0].RowIndex];
+                var form = new FormCoctailIngredient();
+                form.Model = CoctailIngredients[dataGridView.SelectedRows[0].Cells[0].RowIndex];
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    packageForms[dataGridView.SelectedRows[0].Cells[0].RowIndex] = form.Model;
+                    CoctailIngredients[dataGridView.SelectedRows[0].Cells[0].RowIndex] = form.Model;
                     LoadData();
                 }
             }
@@ -119,7 +112,7 @@ namespace AbstractBarView
                 {
                     try
                     {
-                        packageForms.RemoveAt(dataGridView.SelectedRows[0].Cells[0].RowIndex);
+                        CoctailIngredients.RemoveAt(dataGridView.SelectedRows[0].Cells[0].RowIndex);
                     }
                     catch (Exception ex)
                     {
@@ -147,46 +140,54 @@ namespace AbstractBarView
                 MessageBox.Show("Заполните цену", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (packageForms == null || packageForms.Count == 0)
+            if (CoctailIngredients == null || CoctailIngredients.Count == 0)
             {
                 MessageBox.Show("Заполните компоненты", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             try
             {
-                List<CoctailIngredientBindingModel> packageFormBM = new List<CoctailIngredientBindingModel>();
-                for (int i = 0; i < packageForms.Count; ++i)
+                List<CoctailIngredientBindingModel> CoctailIngredientBM = new List<CoctailIngredientBindingModel>();
+                for (int i = 0; i < CoctailIngredients.Count; ++i)
                 {
-                    packageFormBM.Add(new CoctailIngredientBindingModel
+                    CoctailIngredientBM.Add(new CoctailIngredientBindingModel
                     {
-                        Id = packageForms[i].Id,
-                        CoctailId = packageForms[i].CoctailId,
-                        IngredientId = packageForms[i].IngredientId,
-                        Count = packageForms[i].Count
+                        Id = CoctailIngredients[i].Id,
+                        CoctailId = CoctailIngredients[i].CoctailId,
+                        IngredientId = CoctailIngredients[i].IngredientId,
+                        Count = CoctailIngredients[i].Count
                     });
                 }
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdElement(new CoctailBindingModel
+                    response = APIClient.PostRequest("api/Coctail/UpdElement", new CoctailBindingModel
                     {
                         Id = id.Value,
                         CoctailName = textBoxName.Text,
                         Price = Convert.ToInt32(textBoxPrice.Text),
-                        CoctailIngredients = packageFormBM
+                        CoctailIngredients = CoctailIngredientBM
                     });
                 }
                 else
                 {
-                    service.AddElement(new CoctailBindingModel
+                    response = APIClient.PostRequest("api/Coctail/AddElement", new CoctailBindingModel
                     {
                         CoctailName = textBoxName.Text,
                         Price = Convert.ToInt32(textBoxPrice.Text),
-                        CoctailIngredients = packageFormBM
+                        CoctailIngredients = CoctailIngredientBM
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

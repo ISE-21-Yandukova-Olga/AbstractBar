@@ -10,49 +10,52 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace AbstractBarView
 {
     public partial class FormPutOnStorage : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
-        private readonly IStorageService serviceS;
-
-        private readonly IIngredientService serviceC;
-
-        private readonly IMainService serviceM;
-
-        public FormPutOnStorage(IStorageService serviceS, IIngredientService serviceC, IMainService serviceM)
+        public FormPutOnStorage()
         {
             InitializeComponent();
-            this.serviceS = serviceS;
-            this.serviceC = serviceC;
-            this.serviceM = serviceM;
         }
 
         private void FormPutOnStorage_Load(object sender, EventArgs e)
         {
             try
             {
-                List<IngredientViewModel> listC = serviceC.GetList();
-                if (listC != null)
+                var responseC = APIClient.GetRequest("api/Ingredient/GetList");
+                if (responseC.Result.IsSuccessStatusCode)
                 {
-                    comboBoxComponent.DisplayMember = "IngredientName";
-                    comboBoxComponent.ValueMember = "Id";
-                    comboBoxComponent.DataSource = listC;
-                    comboBoxComponent.SelectedItem = null;
+                    List<IngredientViewModel> list = APIClient.GetElement<List<IngredientViewModel>>(responseC);
+                    if (list != null)
+                    {
+                        comboBoxComponent.DisplayMember = "IngredientName";
+                        comboBoxComponent.ValueMember = "Id";
+                        comboBoxComponent.DataSource = list;
+                        comboBoxComponent.SelectedItem = null;
+                    }
                 }
-                List<StorageViewModel> listS = serviceS.GetList();
-                if (listS != null)
+                else
                 {
-                    comboBoxStock.DisplayMember = "StorageName";
-                    comboBoxStock.ValueMember = "Id";
-                    comboBoxStock.DataSource = listS;
-                    comboBoxStock.SelectedItem = null;
+                    throw new Exception(APIClient.GetError(responseC));
+                }
+                var responseS = APIClient.GetRequest("api/Storage/GetList");
+                if (responseS.Result.IsSuccessStatusCode)
+                {
+                    List<StorageViewModel> list = APIClient.GetElement<List<StorageViewModel>>(responseS);
+                    if (list != null)
+                    {
+                        comboBoxStock.DisplayMember = "StorageName";
+                        comboBoxStock.ValueMember = "Id";
+                        comboBoxStock.DataSource = list;
+                        comboBoxStock.SelectedItem = null;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(responseC));
                 }
             }
             catch (Exception ex)
@@ -70,25 +73,32 @@ namespace AbstractBarView
             }
             if (comboBoxComponent.SelectedValue == null)
             {
-                MessageBox.Show("Выберите бланк", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Выберите компонент", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (comboBoxStock.SelectedValue == null)
             {
-                MessageBox.Show("Выберите архив", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Выберите склад", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             try
             {
-                serviceM.PutIngredientOnStorage(new StorageIngredientBindingModel
+                var response = APIClient.PostRequest("api/Main/PutIngredientOnStorage", new StorageIngredientBindingModel
                 {
                     IngredientId = Convert.ToInt32(comboBoxComponent.SelectedValue),
                     StorageId = Convert.ToInt32(comboBoxStock.SelectedValue),
                     Count = Convert.ToInt32(textBoxCount.Text)
                 });
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

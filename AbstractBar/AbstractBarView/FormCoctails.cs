@@ -1,4 +1,5 @@
-﻿using AbstractBarService.Interfaces;
+﻿using AbstractBarService.BindingModels;
+using AbstractBarService.Interfaces;
 using AbstractBarService.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -9,22 +10,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace AbstractBarView
 {
     public partial class FormCoctails : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
-        private readonly ICoctailService service;
-
-        public FormCoctails(ICoctailService service)
+        public FormCoctails()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormCoctails_Load(object sender, EventArgs e)
@@ -36,12 +30,20 @@ namespace AbstractBarView
         {
             try
             {
-                List<CoctailViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/Coctail/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    dataGridView.DataSource = list;
-                    dataGridView.Columns[0].Visible = false;
-                    dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    List<CoctailViewModel> list = APIClient.GetElement<List<CoctailViewModel>>(response);
+                    if (list != null)
+                    {
+                        dataGridView.DataSource = list;
+                        dataGridView.Columns[0].Visible = false;
+                        dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -52,7 +54,7 @@ namespace AbstractBarView
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormCoctail>();
+            var form = new FormCoctail();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 LoadData();
@@ -63,7 +65,7 @@ namespace AbstractBarView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormCoctail>();
+                var form = new FormCoctail();
                 form.Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -81,7 +83,11 @@ namespace AbstractBarView
                     int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                     try
                     {
-                        service.DelElement(id);
+                        var response = APIClient.PostRequest("api/Coctail/DelElement", new CustomerBindingModel { Id = id });
+                        if (!response.Result.IsSuccessStatusCode)
+                        {
+                            throw new Exception(APIClient.GetError(response));
+                        }
                     }
                     catch (Exception ex)
                     {

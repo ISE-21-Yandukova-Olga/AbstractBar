@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractBarService", "Abstr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractBarView", "AbstractBarView\AbstractBarView.csproj", "{AFDE89D0-E9B9-4B96-9AC0-3156428B9350}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractBarRestApi", "AbstractBarRestApi\AbstractBarRestApi.csproj", "{EAABBCB0-E848-4B91-9BAC-E9F9D21BAC0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AFDE89D0-E9B9-4B96-9AC0-3156428B9350}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFDE89D0-E9B9-4B96-9AC0-3156428B9350}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFDE89D0-E9B9-4B96-9AC0-3156428B9350}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAABBCB0-E848-4B91-9BAC-E9F9D21BAC0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAABBCB0-E848-4B91-9BAC-E9F9D21BAC0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAABBCB0-E848-4B91-9BAC-E9F9D21BAC0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAABBCB0-E848-4B91-9BAC-E9F9D21BAC0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

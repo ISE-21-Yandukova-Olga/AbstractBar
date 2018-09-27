@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AbstractBarService.BindingModels
 {
-   
-        public class CoctailIngredientBindingModel
-        {
-            public int Id { get; set; }
 
-            public int CoctailId { get; set; }
+    [DataContract]
+    public class CoctailIngredientBindingModel
+    {
+        [DataMember]
+        public int Id { get; set; }
 
-            public int IngredientId { get; set; }
+        [DataMember]
+        public int CoctailId { get; set; }
 
-            public int Count { get; set; }
-        }
+        [DataMember]
+        public int IngredientId { get; set; }
+
+        [DataMember]
+        public int Count { get; set; }
     }
-
+}
