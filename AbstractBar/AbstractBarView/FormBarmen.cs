@@ -32,19 +32,15 @@ namespace AbstractBarView
             {
                 try
                 {
-                    var response = APIClient.GetRequest("api/Barmen/Get/" + id.Value);
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        var Barmen = APIClient.GetElement<BarmenViewModel>(response);
-                        textBoxFIO.Text = Barmen.BarmenFIO;
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
+                    var implementer = Task.Run(() => APIClient.GetRequestData<BarmenViewModel>("api/Barmen/Get/" + id.Value)).Result;
+                    textBoxFIO.Text = implementer.BarmenFIO;
                 }
                 catch (Exception ex)
                 {
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -57,44 +53,41 @@ namespace AbstractBarView
                 MessageBox.Show("Заполните ФИО", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            try
+            string fio = textBoxFIO.Text;
+            Task task;
+            if (id.HasValue)
             {
-                Task<HttpResponseMessage> response;
-                if (id.HasValue)
+                task = Task.Run(() => APIClient.PostRequestData("api/Barmen/UpdElement", new BarmenBindingModel
                 {
-                    response = APIClient.PostRequest("api/Barmen/UpdElement", new BarmenBindingModel
-                    {
-                        Id = id.Value,
-                        BarmenFIO = textBoxFIO.Text
-                    });
-                }
-                else
-                {
-                    response = APIClient.PostRequest("api/Barmen/AddElement", new BarmenBindingModel
-                    {
-                        BarmenFIO = textBoxFIO.Text
-                    });
-                }
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                    Id = id.Value,
+                    BarmenFIO = fio
+                }));
             }
-            catch (Exception ex)
+            else
             {
+                task = Task.Run(() => APIClient.PostRequestData("api/Barmen/AddElement", new BarmenBindingModel
+                {
+                    BarmenFIO = fio
+                }));
+            }
+
+            task.ContinueWith((prevTask) => MessageBox.Show("Сохранение прошло успешно. Обновите список", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith((prevTask) =>
+            {
+                var ex = (Exception)prevTask.Exception;
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
+            Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }
