@@ -25,5 +25,11 @@ namespace AbstractBarModel
         public DateTime DateCreate { get; set; }
 
         public DateTime? DateImplement { get; set; }
+
+        public virtual Customer Customer { get; set; }
+
+        public virtual Coctail Coctail { get; set; }
+
+        public virtual Barmen Barmen { get; set; }
     }
 }
