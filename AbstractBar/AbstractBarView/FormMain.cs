@@ -1,4 +1,5 @@
-﻿using AbstractBarService.Interfaces;
+﻿using AbstractBarService.BindingModels;
+using AbstractBarService.Interfaces;
 using AbstractBarService.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,13 @@ namespace AbstractBarView
 
         private readonly IMainService service;
 
-        public FormMain(IMainService service)
+        private readonly IReportService reportService;
+
+        public FormMain(IMainService service, IReportService reportService)
         {
             InitializeComponent();
             this.service = service;
+            this.reportService = reportService;
         }
 
         private void LoadData()
@@ -133,6 +137,41 @@ namespace AbstractBarView
         private void buttonRef_Click(object sender, EventArgs e)
         {
             LoadData();
+        }
+
+        private void прайсИзделийToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Filter = "doc|*.doc|docx|*.docx"
+            };
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    reportService.SaveCoctailPrice(new ReportBindingModel
+                    {
+                        FileName = sfd.FileName
+                    });
+                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void загруженностьСкладовToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = Container.Resolve<FormStoragesLoad>();
+            form.ShowDialog();
+        }
+
+        private void заказыКлиентовToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = Container.Resolve<FormCustomerRequests>();
+            form.ShowDialog();
         }
     }
 }
