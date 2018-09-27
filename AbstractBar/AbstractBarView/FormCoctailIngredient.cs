@@ -9,39 +9,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
+
 
 namespace AbstractBarView
 {
     public partial class FormCoctailIngredient : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public CoctailIngredientViewModel Model { set { model = value; } get { return model; } }
-
-        private readonly IIngredientService service;
 
         private CoctailIngredientViewModel model;
 
-        public FormCoctailIngredient(IIngredientService service)
+        public FormCoctailIngredient()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormCoctailIngredient_Load(object sender, EventArgs e)
         {
             try
             {
-                List<IngredientViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/Ingredient/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
                     comboBoxComponent.DisplayMember = "IngredientName";
                     comboBoxComponent.ValueMember = "Id";
-                    comboBoxComponent.DataSource = list;
+                    comboBoxComponent.DataSource = APIClient.GetElement<List<IngredientViewModel>>(response);
                     comboBoxComponent.SelectedItem = null;
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -98,7 +95,5 @@ namespace AbstractBarView
             DialogResult = DialogResult.Cancel;
             Close();
         }
-
-        
     }
 }

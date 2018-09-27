@@ -28,7 +28,7 @@ namespace AbstractBarService.ImplementationsBD
                     StorageName = rec.StorageName,
                     StorageIngredients = context.StorageIngredients
                             .Where(recPC => recPC.StorageId == rec.Id)
-                            .Select(recPC => new StorageIngredientViewModel
+                            .Select(recPC => new StoragesIngredientViewModel
                             {
                                 Id = recPC.Id,
                                 StorageId = recPC.StorageId,
@@ -53,7 +53,7 @@ namespace AbstractBarService.ImplementationsBD
                     StorageName = element.StorageName,
                     StorageIngredients = context.StorageIngredients
                             .Where(recPC => recPC.StorageId == element.Id)
-                            .Select(recPC => new StorageIngredientViewModel
+                            .Select(recPC => new StoragesIngredientViewModel
                             {
                                 Id = recPC.Id,
                                 StorageId = recPC.StorageId,

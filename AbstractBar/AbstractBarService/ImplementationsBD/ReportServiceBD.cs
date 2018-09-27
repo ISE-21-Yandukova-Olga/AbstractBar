@@ -11,7 +11,6 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using System.IO;
 using System.Linq;
-using System.util;
 
 namespace AbstractBarService.ImplementationsBD
 {
@@ -131,7 +130,7 @@ namespace AbstractBarService.ImplementationsBD
             {
                 StorageName = stock.StorageName,
                 TotalCount = stockCompList.Sum(r => r.Count),
-                Ingredients = stockCompList.Select(r => new Tuple<string, int>(r.Ingredient.IngredientName, r.Count))
+                Ingredients = stockCompList.Select(r => new StorageIngredientLoadViewModel { IngredientName = r.Ingredient.IngredientName, Count = r.Count }).ToList()
             })
                             .ToList();
         }
@@ -218,9 +217,9 @@ namespace AbstractBarService.ImplementationsBD
 
                             foreach (var listElem in elem.Ingredients)
                             {
-                                excelcells.Value2 = listElem.Item1;
+                                excelcells.Value2 = listElem.IngredientName;
                                 excelcells.ColumnWidth = 10;
-                                excelcells.get_Offset(0, 1).Value2 = listElem.Item2;
+                                excelcells.get_Offset(0, 1).Value2 = listElem.Count;
                                 excelcells = excelcells.get_Offset(1, 0);
                             }
                         }
