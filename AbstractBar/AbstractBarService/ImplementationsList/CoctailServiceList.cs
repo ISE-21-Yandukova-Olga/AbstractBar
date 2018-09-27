@@ -21,103 +21,64 @@ namespace AbstractBarService.ImplementationsList
 
         public List<CoctailViewModel> GetList()
         {
-            List<CoctailViewModel> result = new List<CoctailViewModel>();
-            for (int i = 0; i < source.Coctails.Count; ++i)
-            {
-                // требуется дополнительно получить список компонентов для изделия и их количество
-                List<CoctailIngredientViewModel> CoctailIngredients = new List<CoctailIngredientViewModel>();
-                for (int j = 0; j < source.CoctailIngredients.Count; ++j)
+            List<CoctailViewModel> result = source.Coctails
+                .Select(rec => new CoctailViewModel
                 {
-                    if (source.CoctailIngredients[j].CoctailId == source.Coctails[i].Id)
-                    {
-                        string IngredientName = string.Empty;
-                        for (int k = 0; k < source.Ingredients.Count; ++k)
-                        {
-                            if (source.CoctailIngredients[j].IngredientId == source.Ingredients[k].Id)
+                    Id = rec.Id,
+                    CoctailName = rec.CoctailName,
+                    Price = rec.Price,
+                    CoctailIngredients = source.CoctailIngredients
+                            .Where(recPC => recPC.CoctailId == rec.Id)
+                            .Select(recPC => new CoctailIngredientViewModel
                             {
-                                IngredientName = source.Ingredients[k].IngredientName;
-                                break;
-                            }
-                        }
-                        CoctailIngredients.Add(new CoctailIngredientViewModel
-                        {
-                            Id = source.CoctailIngredients[j].Id,
-                            CoctailId = source.CoctailIngredients[j].CoctailId,
-                            IngredientId = source.CoctailIngredients[j].IngredientId,
-                            IngredientName = IngredientName,
-                            Count = source.CoctailIngredients[j].Count
-                        });
-                    }
-                }
-                result.Add(new CoctailViewModel
-                {
-                    Id = source.Coctails[i].Id,
-                    CoctailName = source.Coctails[i].CoctailName,
-                    Price = source.Coctails[i].Price,
-                    CoctailIngredients = CoctailIngredients
-                });
-            }
+                                Id = recPC.Id,
+                                CoctailId = recPC.CoctailId,
+                                IngredientId = recPC.IngredientId,
+                                IngredientName = source.Ingredients
+                                    .FirstOrDefault(recC => recC.Id == recPC.IngredientId)?.IngredientName,
+                                Count = recPC.Count
+                            })
+                            .ToList()
+                })
+                .ToList();
             return result;
         }
 
         public CoctailViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Coctails.Count; ++i)
+            Coctail element = source.Coctails.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                // требуется дополнительно получить список компонентов для изделия и их количество
-                List<CoctailIngredientViewModel> CoctailIngredients = new List<CoctailIngredientViewModel>();
-                for (int j = 0; j < source.CoctailIngredients.Count; ++j)
+                return new CoctailViewModel
                 {
-                    if (source.CoctailIngredients[j].CoctailId == source.Coctails[i].Id)
-                    {
-                        string IngredientName = string.Empty;
-                        for (int k = 0; k < source.Ingredients.Count; ++k)
-                        {
-                            if (source.CoctailIngredients[j].IngredientId == source.Ingredients[k].Id)
+                    Id = element.Id,
+                    CoctailName = element.CoctailName,
+                    Price = element.Price,
+                    CoctailIngredients = source.CoctailIngredients
+                            .Where(recPC => recPC.CoctailId == element.Id)
+                            .Select(recPC => new CoctailIngredientViewModel
                             {
-                                IngredientName = source.Ingredients[k].IngredientName;
-                                break;
-                            }
-                        }
-                        CoctailIngredients.Add(new CoctailIngredientViewModel
-                        {
-                            Id = source.CoctailIngredients[j].Id,
-                            CoctailId = source.CoctailIngredients[j].CoctailId,
-                            IngredientId = source.CoctailIngredients[j].IngredientId,
-                            IngredientName = IngredientName,
-                            Count = source.CoctailIngredients[j].Count
-                        });
-                    }
-                }
-                if (source.Coctails[i].Id == id)
-                {
-                    return new CoctailViewModel
-                    {
-                        Id = source.Coctails[i].Id,
-                        CoctailName = source.Coctails[i].CoctailName,
-                        Price = source.Coctails[i].Price,
-                        CoctailIngredients = CoctailIngredients
-                    };
-                }
+                                Id = recPC.Id,
+                                CoctailId = recPC.CoctailId,
+                                IngredientId = recPC.IngredientId,
+                                IngredientName = source.Ingredients
+                                        .FirstOrDefault(recC => recC.Id == recPC.IngredientId)?.IngredientName,
+                                Count = recPC.Count
+                            })
+                            .ToList()
+                };
             }
-
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(CoctailBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Coctails.Count; ++i)
+            Coctail element = source.Coctails.FirstOrDefault(rec => rec.CoctailName == model.CoctailName);
+            if (element != null)
             {
-                if (source.Coctails[i].Id > maxId)
-                {
-                    maxId = source.Coctails[i].Id;
-                }
-                if (source.Coctails[i].CoctailName == model.CoctailName)
-                {
-                    throw new Exception("Уже есть изделие с таким названием");
-                }
+                throw new Exception("Уже есть изделие с таким названием");
             }
+            int maxId = source.Coctails.Count > 0 ? source.Coctails.Max(rec => rec.Id) : 0;
             source.Coctails.Add(new Coctail
             {
                 Id = maxId + 1,
@@ -125,143 +86,102 @@ namespace AbstractBarService.ImplementationsList
                 Price = model.Price
             });
             // компоненты для изделия
-            int maxPCId = 0;
-            for (int i = 0; i < source.CoctailIngredients.Count; ++i)
-            {
-                if (source.CoctailIngredients[i].Id > maxPCId)
-                {
-                    maxPCId = source.CoctailIngredients[i].Id;
-                }
-            }
+            int maxPCId = source.CoctailIngredients.Count > 0 ?
+                                    source.CoctailIngredients.Max(rec => rec.Id) : 0;
             // убираем дубли по компонентам
-            for (int i = 0; i < model.CoctailIngredients.Count; ++i)
-            {
-                for (int j = 1; j < model.CoctailIngredients.Count; ++j)
-                {
-                    if (model.CoctailIngredients[i].IngredientId ==
-                        model.CoctailIngredients[j].IngredientId)
-                    {
-                        model.CoctailIngredients[i].Count +=
-                            model.CoctailIngredients[j].Count;
-                        model.CoctailIngredients.RemoveAt(j--);
-                    }
-                }
-            }
+            var groupIngredients = model.CoctailIngredients
+                                        .GroupBy(rec => rec.IngredientId)
+                                        .Select(rec => new
+                                        {
+                                            IngredientId = rec.Key,
+                                            Count = rec.Sum(r => r.Count)
+                                        });
             // добавляем компоненты
-            for (int i = 0; i < model.CoctailIngredients.Count; ++i)
+            foreach (var groupIngredient in groupIngredients)
             {
                 source.CoctailIngredients.Add(new CoctailIngredient
                 {
                     Id = ++maxPCId,
                     CoctailId = maxId + 1,
-                    IngredientId = model.CoctailIngredients[i].IngredientId,
-                    Count = model.CoctailIngredients[i].Count
+                    IngredientId = groupIngredient.IngredientId,
+                    Count = groupIngredient.Count
                 });
             }
         }
 
         public void UpdElement(CoctailBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Coctails.Count; ++i)
+            Coctail element = source.Coctails.FirstOrDefault(rec =>
+                                        rec.CoctailName == model.CoctailName && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Coctails[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Coctails[i].CoctailName == model.CoctailName &&
-                    source.Coctails[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть изделие с таким названием");
-                }
+                throw new Exception("Уже есть изделие с таким названием");
             }
-            if (index == -1)
+            element = source.Coctails.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Coctails[index].CoctailName = model.CoctailName;
-            source.Coctails[index].Price = model.Price;
-            int maxPCId = 0;
-            for (int i = 0; i < source.CoctailIngredients.Count; ++i)
-            {
-                if (source.CoctailIngredients[i].Id > maxPCId)
-                {
-                    maxPCId = source.CoctailIngredients[i].Id;
-                }
-            }
+            element.CoctailName = model.CoctailName;
+            element.Price = model.Price;
+
+            int maxPCId = source.CoctailIngredients.Count > 0 ? source.CoctailIngredients.Max(rec => rec.Id) : 0;
             // обновляем существуюущие компоненты
-            for (int i = 0; i < source.CoctailIngredients.Count; ++i)
+            var compIds = model.CoctailIngredients.Select(rec => rec.IngredientId).Distinct();
+            var updateIngredients = source.CoctailIngredients
+                                            .Where(rec => rec.CoctailId == model.Id &&
+                                           compIds.Contains(rec.IngredientId));
+            foreach (var updateIngredient in updateIngredients)
             {
-                if (source.CoctailIngredients[i].CoctailId == model.Id)
-                {
-                    bool flag = true;
-                    for (int j = 0; j < model.CoctailIngredients.Count; ++j)
-                    {
-                        // если встретили, то изменяем количество
-                        if (source.CoctailIngredients[i].Id == model.CoctailIngredients[j].Id)
-                        {
-                            source.CoctailIngredients[i].Count = model.CoctailIngredients[j].Count;
-                            flag = false;
-                            break;
-                        }
-                    }
-                    // если не встретили, то удаляем
-                    if (flag)
-                    {
-                        source.CoctailIngredients.RemoveAt(i--);
-                    }
-                }
+                updateIngredient.Count = model.CoctailIngredients
+                                                .FirstOrDefault(rec => rec.Id == updateIngredient.Id).Count;
             }
+            source.CoctailIngredients.RemoveAll(rec => rec.CoctailId == model.Id &&
+                                       !compIds.Contains(rec.IngredientId));
             // новые записи
-            for (int i = 0; i < model.CoctailIngredients.Count; ++i)
+            var groupIngredients = model.CoctailIngredients
+                                        .Where(rec => rec.Id == 0)
+                                        .GroupBy(rec => rec.IngredientId)
+                                        .Select(rec => new
+                                        {
+                                            IngredientId = rec.Key,
+                                            Count = rec.Sum(r => r.Count)
+                                        });
+            foreach (var groupIngredient in groupIngredients)
             {
-                if (model.CoctailIngredients[i].Id == 0)
+                CoctailIngredient elementPC = source.CoctailIngredients
+                                        .FirstOrDefault(rec => rec.CoctailId == model.Id &&
+                                                        rec.IngredientId == groupIngredient.IngredientId);
+                if (elementPC != null)
                 {
-                    // ищем дубли
-                    for (int j = 0; j < source.CoctailIngredients.Count; ++j)
+                    elementPC.Count += groupIngredient.Count;
+                }
+                else
+                {
+                    source.CoctailIngredients.Add(new CoctailIngredient
                     {
-                        if (source.CoctailIngredients[j].CoctailId == model.Id &&
-                            source.CoctailIngredients[j].IngredientId == model.CoctailIngredients[i].IngredientId)
-                        {
-                            source.CoctailIngredients[j].Count += model.CoctailIngredients[i].Count;
-                            model.CoctailIngredients[i].Id = source.CoctailIngredients[j].Id;
-                            break;
-                        }
-                    }
-                    // если не нашли дубли, то новая запись
-                    if (model.CoctailIngredients[i].Id == 0)
-                    {
-                        source.CoctailIngredients.Add(new CoctailIngredient
-                        {
-                            Id = ++maxPCId,
-                            CoctailId = model.Id,
-                            IngredientId = model.CoctailIngredients[i].IngredientId,
-                            Count = model.CoctailIngredients[i].Count
-                        });
-                    }
+                        Id = ++maxPCId,
+                        CoctailId = model.Id,
+                        IngredientId = groupIngredient.IngredientId,
+                        Count = groupIngredient.Count
+                    });
                 }
             }
         }
 
         public void DelElement(int id)
         {
-            // удаяем записи по компонентам при удалении изделия
-            for (int i = 0; i < source.CoctailIngredients.Count; ++i)
+            Coctail element = source.Coctails.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.CoctailIngredients[i].CoctailId == id)
-                {
-                    source.CoctailIngredients.RemoveAt(i--);
-                }
+                // удаяем записи по компонентам при удалении изделия
+                source.CoctailIngredients.RemoveAll(rec => rec.CoctailId == id);
+                source.Coctails.Remove(element);
             }
-            for (int i = 0; i < source.Coctails.Count; ++i)
+            else
             {
-                if (source.Coctails[i].Id == id)
-                {
-                    source.Coctails.RemoveAt(i);
-                    return;
-                }
+                throw new Exception("Элемент не найден");
             }
-            throw new Exception("Элемент не найден");
         }
     }
 }
